@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Olimpiada Ekologiczna App</title>
+
+<style>
+
+body{
+font-family: -apple-system,BlinkMacSystemFont;
+background: linear-gradient(135deg,#0f2027,#2c5364);
+color:white;
+margin:0;
+padding:0;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.app{
+width:100%;
+max-width:420px;
+padding:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+border-radius:20px;
+padding:25px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+animation:fade .5s ease;
+}
+
+button{
+width:100%;
+padding:15px;
+margin:8px 0;
+border:none;
+border-radius:12px;
+font-size:16px;
+background:#3ecf8e;
+color:white;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+
+.answer{
+background:#ffffff15;
+}
+
+.correct{
+background:#1db954 !important;
+}
+
+.wrong{
+background:#ff4d4d !important;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(10px)}
+to{opacity:1}
+}
+
+.progress{
+height:6px;
+background:#ffffff20;
+border-radius:6px;
+margin-bottom:20px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+background:#3ecf8e;
+width:0%;
+transition:.3s;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div id="menu" class="card">
+
+<h2>🌍 Olimpiada Ekologiczna</h2>
+
+<button onclick="startQuiz()">Rozpocznij quiz</button>
+<button onclick="showStats()">Statystyki</button>
+
+</div>
+
+<div id="quiz" class="card" style="display:none">
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<h3 id="question"></h3>
+
+<div id="answers"></div>
+
+<button onclick="exitQuiz()">Wyjdź</button>
+
+</div>
+
+<div id="stats" class="card" style="display:none">
+
+<h2>📊 Statystyki</h2>
+
+<p id="score"></p>
+
+<button onclick="goMenu()">Powrót</button>
+
+</div>
+
+</div>
+
+<script>
+
+let questions=[
+{
+q:"Który gaz odpowiada głównie za efekt cieplarniany?",
+a:["Tlen","Dwutlenek węgla","Azot","Hel"],
+correct:1
+},
+{
+q:"Który biom jest najbogatszy w bioróżnorodność?",
+a:["Tundra","Pustynia","Las tropikalny","Step"],
+correct:2
+},
+{
+q:"Który proces usuwa CO₂ z atmosfery?",
+a:["Oddychanie","Fotosynteza","Spalanie","Parowanie"],
+correct:1
+}
+]
+
+let index=0
+let score=0
+
+function startQuiz(){
+
+document.getElementById("menu").style.display="none"
+document.getElementById("quiz").style.display="block"
+
+index=0
+score=0
+
+loadQuestion()
+
+}
+
+function loadQuestion(){
+
+let q=questions[index]
+
+document.getElementById("question").innerText=q.q
+
+let answers=document.getElementById("answers")
+
+answers.innerHTML=""
+
+q.a.forEach((ans,i)=>{
+
+let btn=document.createElement("button")
+btn.innerText=ans
+btn.className="answer"
+
+btn.onclick=()=>answer(btn,i)
+
+answers.appendChild(btn)
+
+})
+
+updateBar()
+
+}
+
+function answer(btn,i){
+
+let q=questions[index]
+
+let buttons=document.querySelectorAll(".answer")
+
+buttons.forEach(b=>b.disabled=true)
+
+if(i===q.correct){
+
+btn.classList.add("correct")
+score++
+
+}else{
+
+btn.classList.add("wrong")
+buttons[q.correct].classList.add("correct")
+
+}
+
+setTimeout(()=>{
+
+index++
+
+if(index>=questions.length){
+
+finish()
+
+}else{
+
+loadQuestion()
+
+}
+
+},900)
+
+}
+
+function updateBar(){
+
+let percent=(index/questions.length)*100
+document.getElementById("bar").style.width=percent+"%"
+
+}
+
+function finish(){
+
+localStorage.setItem("score",score)
+
+document.getElementById("quiz").style.display="none"
+
+showStats()
+
+}
+
+function showStats(){
+
+document.getElementById("menu").style.display="none"
+document.getElementById("stats").style.display="block"
+
+document.getElementById("score").innerText=
+"Ostatni wynik: "+localStorage.getItem("score")
+
+}
+
+function goMenu(){
+
+document.getElementById("stats").style.display="none"
+document.getElementById("menu").style.display="block"
+
+}
+
+function exitQuiz(){
+
+document.getElementById("quiz").style.display="none"
+document.getElementById("menu").style.display="block"
+
+}
+
+</script>
+
+</body>
+</html>
